@@ -20,6 +20,7 @@ api_app = FastAPI(title="api-app")
 app.mount("/api", api_app) # need to do this so that it doesn't try to interpret api calls as static file requests
 app.mount("/", StaticFiles(directory="../datafest-webpage/build", html=True), name="build")
 
+
 @api_app.post("/text")
 async def post_text(text_request: TextRequest):
     if not text_request.text:
