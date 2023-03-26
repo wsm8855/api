@@ -40,9 +40,10 @@ async def post_text(text_request: TextRequest):
     else:
         if text_request.text is None:
             # malformed request
-            raise HTTPException(status_code=400, detail="Text cannot be null")
-        client_text = text_request.text
-        recommended_dialogs = recommender_service.query_by_text(client_text)
+            raise HTTPException(status_code=400, detail="Text and questionUno cannot both be null")
+        # client_text = text_request.text
+        # recommended_dialogs = recommender_service.query_by_text(client_text)
+        raise HTTPException(status_code=400, detail="Null questionUno is not yet supported")
 
     return {"recommendations": recommended_dialogs}
 

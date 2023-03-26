@@ -46,6 +46,9 @@ class RecommenderService(threading.Thread):
         print("ntotal:", self.faiss_index.ntotal)
         print("complete")
 
+        # setup novel-input embedding
+        self.embedding_model = None
+
     def query_by_existing_embedding(self, question_uno):
         df = self.questionposts_combined
         embedding_index = df[df["QuestionUno"] == question_uno].index[0]
@@ -72,8 +75,7 @@ class RecommenderService(threading.Thread):
             if text is THREAD_SHUTDOWN_SIGNAL:
                 break
             # do stuff...
-            time.sleep(1)
-            self.result = "Echo worked " + text
+            self.result = self.query_by_embedding(self.embedding_model.embed(text))
             self.event.set()
 
     def stop(self):
