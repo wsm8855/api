@@ -59,7 +59,10 @@ class RecommenderService(threading.Thread):
         return self.result
 
     def query_by_embedding(self, embedding, num_neighbors_to_return=5):
-        distances, indexes = self.faiss_index.search(embedding.astype(np.float32), num_neighbors_to_return)
+        embedding = embedding.astype(np.float32)
+        print(embedding.shape, embedding.dtype)
+        distances, indexes = self.faiss_index.search(embedding, num_neighbors_to_return)
+        print(indexes)
         results = list(self.questionposts_combined.iloc[indexes]["PostText"])
         return results
 
