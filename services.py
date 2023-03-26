@@ -13,6 +13,10 @@ def unpickle(fn):
         return pickle.load(f)
 
 
+def clean_post_text(post_text):
+    return post_text.replace("###", "<redact>")
+
+
 class ThreadShutdownSignal:
     pass
 
@@ -58,13 +62,13 @@ class RecommenderService(threading.Thread):
             post_texts.pop(duplicate_index)  # remove duplicate
         else:
             post_texts.pop()  # no duplicate, remove last item (least similar)
-        return post_texts
+        return [clean_post_text(post_text) for post_text in post_texts]
 
     def query_by_text(self, text):
         self.event.clear()
         self.queue.put(text)
         self.event.wait()
-        return self.result
+        return [clean_post_text(post_text) for post_text in self.result]
 
     def query_by_embedding(self, embedding, num_neighbors_to_return=None):
         if num_neighbors_to_return is None:
@@ -130,7 +134,7 @@ class CategoricalQueryService:
             choice = options.iloc[np.random.choice(np.arange(len(options)))]
             question_uno = choice["QuestionUno"]
             post_text = choice["PostText"].split("|*|")[0]
-            return question_uno, post_text
+            return question_uno, clean_post_text(post_text)
         except Exception as ex:
             print("No data for this particular combination of attributes.")
             print(ex)
