@@ -77,6 +77,7 @@ class CategoricalQueryService:
             question_uno = choice["QuestionUno"]
             post_text = choice["PostText"].split("|*|")[0]
             return question_uno, post_text
-        except:
+        except Exception as ex:
             print("No data for this particular combination of attributes.")
+            print(ex)
             return None

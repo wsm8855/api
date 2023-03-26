@@ -47,6 +47,7 @@ async def post_categorical_query(query_request: CategoricalRequest):
     ethnicities = none_if_empty(query_request.ethnicities)
     genders = none_if_empty(query_request.genders)
     states = none_if_empty(query_request.states)
+    print(query_request)
 
     result = categorical_query_service.query_question(
         age=age,
@@ -63,6 +64,7 @@ async def post_categorical_query(query_request: CategoricalRequest):
             "questionUno": question_uno,
             "text": text
         }
+    print(f"{result=}")
     return result
 
 
