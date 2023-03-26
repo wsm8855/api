@@ -73,7 +73,7 @@ class CategoricalQueryService:
 
         options = df[conditions][["QuestionUno", "PostText"]]
         try:
-            choice = np.random.choice(options)
+            choice = options.iloc[np.random.choice(np.arange(len(options)))]
             question_uno = choice["QuestionUno"]
             post_text = choice["PostText"].split("|*|")[0]
             return question_uno, post_text
