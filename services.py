@@ -71,10 +71,12 @@ class CategoricalQueryService:
         if states is not None:
             conditions = conditions & (df["StateName_x"].isin(states))
 
-        options = df[conditions]["PostText"]
+        options = df[conditions][["QuestionUno", "PostText"]]
         try:
             choice = np.random.choice(options)
-            return choice.split("|*|")[0]
+            question_uno = choice["QuestionUno"]
+            post_text = choice["PostText"].split("|*|")[0]
+            return question_uno, post_text
         except:
             print("No data for this particular combination of attributes.")
             return None

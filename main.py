@@ -9,9 +9,14 @@ from models import TextRequest, CategoricalRequest
 CATEGORICAL_QUERY_FILE = "../../data/client_questionposts.csv"
 FRONTEND_DIRECTORY = "../datafest-webpage/build"
 
+print("Starting recommender service...", end=" ")
 recommender_service = RecommenderService()
 recommender_service.start()
+print("started.")
+
+print("Starting categorical query service service...", end=" ")
 categorical_query_service = CategoricalQueryService(CATEGORICAL_QUERY_FILE)
+print("started.")
 
 app = FastAPI(title="app")
 api_app = FastAPI(title="api-app")
@@ -37,7 +42,16 @@ async def get_categorical_query(query_request: CategoricalRequest):
         genders=query_request.genders,
         states=query_request.states
     )
-    return {"result": result}
+    if result is None:
+        result = {"success": False}  # sad path
+    else:
+        question_uno, text = result  # happy path
+        result = {
+            "success": True,
+            "questionUno": question_uno,
+            "text": text
+        }
+    return result
 
 
 if __name__ == '__main__':
