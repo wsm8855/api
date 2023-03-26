@@ -7,10 +7,20 @@ print("Sending request...")
 response = requests.get(SERVER)
 print(response)
 
-print("Sending request...")
+print("Sending text request (good)...")
 response = requests.post(SERVER + "api/text/", data=json.dumps({"text": "echo!"}))
 print(response.json())
 
-print("Sending request...")
+print("Sending text request (bad)...")
 response = requests.post(SERVER + "api/text/", data=json.dumps({"wrong_field_name": "this should fail"}))
+print(response.json())
+
+print("Sending categorical query (good)")
+response = requests.post(SERVER + "api/categoricalQuery/",
+                         data=json.dumps({
+                             "age": [24, 26],
+                             "ethnicities": ["Caucasian"],
+                             "genders": ["Female"],
+                             "states": ["New york"],
+                         }))
 print(response.json())
