@@ -30,11 +30,17 @@ app.mount("/", StaticFiles(directory=FRONTEND_DIRECTORY, html=True), name="build
 
 @api_app.post("/text")
 async def post_text(text_request: TextRequest):
-    if not text_request.text:
-        raise HTTPException(status_code=400, detail="Request missing text field")
-    client_text = text_request.text
-    result = recommender_service.get_result(client_text)
-    return {"result": result}
+    if text_request.questionUno is not None:
+        # using text we provided via categorical query
+        recommended_dialogs = recommender_service.query_by_existing_embedding(text_request.questionUno)
+    else:
+        if text_request.text is None:
+            # malformed request
+            raise HTTPException(status_code=400, detail="Text cannot be null")
+        client_text = text_request.text
+        recommended_dialogs = recommender_service.query_by_text(client_text)
+
+    return {"recommendations": recommended_dialogs}
 
 
 @api_app.post("/categoricalQuery")

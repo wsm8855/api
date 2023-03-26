@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 
 class TextRequest(BaseModel):
-    text: str
+    text: Optional[str]
+    questionUno: Optional[str]
 
 
 class CategoricalRequest(BaseModel):

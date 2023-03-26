@@ -46,16 +46,24 @@ class RecommenderService(threading.Thread):
         print("ntotal:", self.faiss_index.ntotal)
         print("complete")
 
-    def query_by_existing_embedding(self, emnedding_id):
-        pass
+    def query_by_existing_embedding(self, question_uno):
+        df = self.questionposts_combined
+        embedding_index = df[df["QuestionUno"] == question_uno].index[0]
+        embedding = self.index_vectors[embedding_index].reshape(1, -1)
+        return self.query_by_embedding(embedding)
 
-    def query_by_text(self):
-        pass
+    def query_by_text(self, text):
+        self.event.clear()
+        self.queue.put(text)
+        self.event.wait()
+        return self.result
 
-    def query_by_embedding(self, embedding):
+    def query_by_embedding(self, embedding, num_neighbors_to_return=5):
         num_neighbors_to_return = 1
         distances, indexes = self.faiss_index.search(embedding, num_neighbors_to_return)
-        # TODO get conversation...
+        results = list(self.questionposts_combined.iloc[indexes]["PostText"])
+        return results
+
 
     def run(self, *args, **kwargs):
         while self.running:
@@ -66,12 +74,6 @@ class RecommenderService(threading.Thread):
             time.sleep(1)
             self.result = "Echo worked " + text
             self.event.set()
-
-    def get_result(self, text):
-        self.event.clear()
-        self.queue.put(text)
-        self.event.wait()
-        return self.result
 
     def stop(self):
         self.running = False
