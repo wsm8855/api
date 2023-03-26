@@ -22,7 +22,7 @@ THREAD_SHUTDOWN_SIGNAL = ThreadShutdownSignal()
 
 class RecommenderService(threading.Thread):
 
-    def __init__(self, num_neighbors_to_return, index_vectors_file, index_keys_file, questionposts_combined_file):
+    def __init__(self, num_neighbors_to_return, index_vectors_file, questionposts_combined_file):
         # setup thread stuff
         super().__init__()
         self.queue = Queue()
@@ -33,12 +33,10 @@ class RecommenderService(threading.Thread):
         # setup faiss indexing
         self.num_neighbors_to_return = num_neighbors_to_return
         self.index_vectors_file = index_vectors_file
-        self.index_keys_file = index_keys_file
         self.questionposts_combined_file = questionposts_combined_file
 
         self.questionposts_combined = pd.read_csv(self.questionposts_combined_file)
         self.index_vectors = unpickle(self.index_vectors_file)
-        self.index_keys = unpickle(self.index_keys_file)
 
         print("Indexing data...", end=" ", flush=True)
         self.faiss_index = faiss.IndexFlatL2(self.index_vectors.shape[1])  # build the index

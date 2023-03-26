@@ -10,14 +10,13 @@ print("Importing dash app...")
 from aba_visualization import dash_app
 
 NUM_NEIGHBORS_TO_RETURN = 5
-INDEX_VECTORS_FILE = "../../data/index_vectors.pkl"
-INDEX_KEYS_FILE = "../../data/index_vectors.pkl"
+INDEX_VECTORS_FILE = "../../data/index_vectors_last.pkl"
 QUESTIONPOSTS_COMBINED_FILE = "../../data/questionposts_combined.csv"
 CATEGORICAL_QUERY_FILE = "../../data/client_questionposts.csv"
 FRONTEND_DIRECTORY = "../datafest-webpage/build"
 
 print("Starting recommender service...", end=" ", flush=True)
-recommender_service = RecommenderService(NUM_NEIGHBORS_TO_RETURN, INDEX_VECTORS_FILE, INDEX_KEYS_FILE, QUESTIONPOSTS_COMBINED_FILE)
+recommender_service = RecommenderService(NUM_NEIGHBORS_TO_RETURN, INDEX_VECTORS_FILE, QUESTIONPOSTS_COMBINED_FILE)
 recommender_service.start()
 print("started.")
 
