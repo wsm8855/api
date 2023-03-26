@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 
 client_df = pd.read_csv("../../data/client_questionposts.csv")
-with open("map_files.pickle", "rb+") as file:
+with open("../../data/map_files.pickle", "rb+") as file:
     fips_grouped, cat_list, ethnic_list = pickle.load(file)
 
 # fips_grouped = client_df.groupby("fips_codes")
@@ -44,6 +44,7 @@ import plotly.express as px
 dash_app = Dash(__name__, requests_pathname_prefix='/dash/')
 
 dash_app.layout = html.Div([
+    dcc.Link('Home Page', href='/', refresh=True),
     # html.H4('Polotical candidate voting pool analysis'),
     # html.P("Select a candidate:"),
     dcc.RadioItems(
