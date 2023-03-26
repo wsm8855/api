@@ -34,8 +34,8 @@ async def post_text(text_request: TextRequest):
     return {"result": result}
 
 
-@api_app.get("/categoricalQuery")
-async def get_categorical_query(query_request: CategoricalRequest):
+@api_app.post("/categoricalQuery")
+async def post_categorical_query(query_request: CategoricalRequest):
     result = categorical_query_service.query_question(
         age=query_request.age,
         ethnicities=query_request.ethnicities,
