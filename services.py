@@ -84,9 +84,14 @@ class CategoricalQueryService:
         self.dataset_filename = dataset_filename
         self.df = pd.read_csv(dataset_filename)
 
-    def query_question(self, age=None, ethnicities=None, genders=None, states=None):
+    def query_question(self, categories=None, age=None, ethnicities=None, genders=None, states=None):
         df = self.df
         conditions = np.full((len(df)), True)
+        if categories is not None:
+            cat_cond = (df["Category"].str.contains(categories[0], na=False))
+            for i in range(1, len(categories)):
+                cat_cond = cat_cond | (df["Category"].str.contains(categories[i], na=False))
+            conditions = conditions & cat_cond
         if age is not None:
             conditions = conditions & (df["Age_x"].between(age[0], age[1], inclusive="both"))
         if ethnicities is not None:

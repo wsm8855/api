@@ -7,6 +7,7 @@ class TextRequest(BaseModel):
 
 
 class CategoricalRequest(BaseModel):
+    categories: List[str]
     age: List[int]
     ethnicities: List[str]
     genders: List[str]

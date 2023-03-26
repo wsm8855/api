@@ -47,12 +47,14 @@ async def post_categorical_query(query_request: CategoricalRequest):
             return None
         return thing
 
+    categories = none_if_empty(query_request.categories)
     age = none_if_empty(query_request.age)
     ethnicities = none_if_empty(query_request.ethnicities)
     genders = none_if_empty(query_request.genders)
     states = none_if_empty(query_request.states)
     print(f'{age=} {ethnicities=} {genders=} {states=}')
     result = categorical_query_service.query_question(
+        categories=categories,
         age=age,
         ethnicities=ethnicities,
         genders=genders,
