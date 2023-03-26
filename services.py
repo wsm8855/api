@@ -1,9 +1,16 @@
 import threading
 import time
 from queue import Queue
+import pickle
 
 import numpy as np
 import pandas as pd
+import faiss
+
+
+def unpickle(fn):
+    with open(fn, "rb") as f:
+        return pickle.load(f)
 
 
 class ThreadShutdownSignal:
@@ -15,12 +22,40 @@ THREAD_SHUTDOWN_SIGNAL = ThreadShutdownSignal()
 
 class RecommenderService(threading.Thread):
 
-    def __init__(self):
+    def __init__(self, index_vectors_file, index_keys_file, questionposts_combined_file):
+        # setup thread stuff
         super().__init__()
         self.queue = Queue()
         self.event = threading.Event()
         self.running = True
         self.result = None
+
+        # setup faiss indexing
+        self.index_vectors_file = index_vectors_file
+        self.index_keys_file = index_keys_file
+        self.questionposts_combined_file = questionposts_combined_file
+
+        self.questionposts_combined = pd.read_csv(self.questionposts_combined_file)
+        self.index_vectors = unpickle(self.index_vectors_file)
+        self.index_keys = unpickle(self.index_keys_file)
+
+        print("Indexing data...", end=" ", flush=True)
+        self.faiss_index = faiss.IndexFlatL2(self.index_vectors.shape[1])  # build the index
+        print("Trained:", self.faiss_index.is_trained)
+        self.faiss_index.add(self.index_vectors)  # add vectors to the index
+        print("ntotal:", self.faiss_index.ntotal)
+        print("complete")
+
+    def query_by_existing_embedding(self, emnedding_id):
+        pass
+
+    def query_by_text(self):
+        pass
+
+    def query_by_embedding(self, embedding):
+        num_neighbors_to_return = 1
+        distances, indexes = self.faiss_index.search(embedding, num_neighbors_to_return)
+        # TODO get conversation...
 
     def run(self, *args, **kwargs):
         while self.running:
