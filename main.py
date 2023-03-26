@@ -9,12 +9,12 @@ from models import TextRequest, CategoricalRequest
 CATEGORICAL_QUERY_FILE = "../../data/client_questionposts.csv"
 FRONTEND_DIRECTORY = "../datafest-webpage/build"
 
-print("Starting recommender service...", end=" ")
+print("Starting recommender service...", end=" ", flush=True)
 recommender_service = RecommenderService()
 recommender_service.start()
 print("started.")
 
-print("Starting categorical query service service...", end=" ")
+print("Starting categorical query service service...", end=" ", flush=True)
 categorical_query_service = CategoricalQueryService(CATEGORICAL_QUERY_FILE)
 print("started.")
 
