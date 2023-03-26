@@ -62,10 +62,9 @@ class RecommenderService(threading.Thread):
         embedding = embedding.astype(np.float32)
         print(embedding.shape, embedding.dtype)
         distances, indexes = self.faiss_index.search(embedding, num_neighbors_to_return)
-        print(indexes)
-        results = list(self.questionposts_combined.iloc[indexes]["PostText"])
+        print(indexes.squeeze())
+        results = list(self.questionposts_combined.iloc[indexes.squeeze()]["PostText"])
         return results
-
 
     def run(self, *args, **kwargs):
         while self.running:
