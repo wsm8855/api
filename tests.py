@@ -1,7 +1,7 @@
 import requests
 import json
 
-SERVER = "http://localhost:8000/"
+SERVER = "http://localhost:8889/"
 
 print("Sending request...")
 response = requests.get(SERVER)
