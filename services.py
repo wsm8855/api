@@ -76,12 +76,7 @@ class RecommenderService(threading.Thread):
         df = self.questionposts_combined
         embedding_index = df[df["QuestionUno"] == question_uno].index[0]
         embedding = self.index_vectors[embedding_index].reshape(1, -1)
-        post_texts, questionUnos = self.query_by_embedding(embedding, self.num_neighbors_to_return + 1)
-        duplicate_index = questionUnos.index(question_uno)
-        if duplicate_index != -1:
-            post_texts.pop(duplicate_index)  # remove duplicate
-        else:
-            post_texts.pop()  # no duplicate, remove last item (least similar)
+        post_texts, questionUnos = self.query_by_embedding(embedding)
         return [clean_post_text(post_text) for post_text in post_texts]
 
     def query_by_text(self, text):

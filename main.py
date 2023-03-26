@@ -85,5 +85,7 @@ async def post_categorical_query(query_request: CategoricalRequest):
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="0.0.0.0", port=8889)
-    recommender_service.stop()
+    try:
+        uvicorn.run(app, host="0.0.0.0", port=8889)
+    finally:
+        recommender_service.stop()
