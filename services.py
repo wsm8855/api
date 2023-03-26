@@ -69,7 +69,7 @@ class RecommenderService(threading.Thread):
 
             model_output = self.model(**message_tokenized)
             model_output = model_output.last_hidden_state.squeeze().mean(axis=0).numpy()
-
+            model_output = np.expand_dims(model_output, 0)
             return model_output
 
     def query_by_existing_embedding(self, question_uno):
