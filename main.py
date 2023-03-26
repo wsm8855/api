@@ -2,9 +2,12 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.exceptions import HTTPException
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.wsgi import WSGIMiddleware
 
 from services import RecommenderService, CategoricalQueryService
 from models import TextRequest, CategoricalRequest
+print("Importing dash app...")
+from aba_visualization import dash_app
 
 INDEX_VECTORS_FILE = "../../data/index_vectors.pkl"
 INDEX_KEYS_FILE = "../../data/index_vectors.pkl"
@@ -24,6 +27,7 @@ print("started.")
 app = FastAPI(title="app")
 api_app = FastAPI(title="api-app")
 
+app.mount("/dash", WSGIMiddleware(dash_app.server))
 app.mount("/api", api_app)  # need to do this so that it doesn't try to interpret api calls as static file requests
 app.mount("/", StaticFiles(directory=FRONTEND_DIRECTORY, html=True), name="build")
 
