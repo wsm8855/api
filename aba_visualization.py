@@ -41,7 +41,7 @@ import plotly.express as px
 
 # token = open(".mapbox_token").read() # you will need your own token
 
-dash_app = Dash(__name__)
+dash_app = Dash(__name__, requests_pathname_prefix='/dash/')
 
 dash_app.layout = html.Div([
     # html.H4('Polotical candidate voting pool analysis'),
