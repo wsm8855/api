@@ -6,6 +6,9 @@ import pickle
 import numpy as np
 import pandas as pd
 import faiss
+# bartesquire imports
+import torch
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 
 
 def unpickle(fn):
@@ -26,7 +29,7 @@ THREAD_SHUTDOWN_SIGNAL = ThreadShutdownSignal()
 
 class RecommenderService(threading.Thread):
 
-    def __init__(self, num_neighbors_to_return, index_vectors_file, questionposts_combined_file):
+    def __init__(self, num_neighbors_to_return, index_vectors_file, questionposts_combined_file, model_directory):
         # setup thread stuff
         super().__init__()
         self.queue = Queue()
@@ -50,7 +53,24 @@ class RecommenderService(threading.Thread):
         print("complete")
 
         # setup novel-input embedding
-        self.embedding_model = None
+        self.model_directory = model_directory
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_directory)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_directory).get_encoder()
+        self.model.eval()
+
+    def tokenize_message(self, message):
+        message = "Client: " + message
+        message = message.replace('###', '<redact>')
+        return self.tokenizer(message, max_length=600, truncation=True, return_tensors='pt')
+
+    def get_model_embedding(self, message):
+        with torch.no_grad():
+            message_tokenized = self.tokenize_message(message)
+
+            model_output = self.model(**message_tokenized)
+            model_output = model_output.last_hidden_state.squeeze().mean(axis=0).numpy()
+
+            return model_output
 
     def query_by_existing_embedding(self, question_uno):
         df = self.questionposts_combined
@@ -87,7 +107,9 @@ class RecommenderService(threading.Thread):
             if text is THREAD_SHUTDOWN_SIGNAL:
                 break
             # do stuff...
-            post_texts, questionUnos = self.query_by_embedding(self.embedding_model.embed(text))
+            embedding = self.get_model_embedding(text)
+            print("embedding", embedding.shape)
+            post_texts, questionUnos = self.query_by_embedding(embedding)
             self.result = post_texts
             self.event.set()
 

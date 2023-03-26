@@ -14,9 +14,10 @@ INDEX_VECTORS_FILE = "../../data/index_vectors_last.pkl"
 QUESTIONPOSTS_COMBINED_FILE = "../../data/questionposts_combined.csv"
 CATEGORICAL_QUERY_FILE = "../../data/client_questionposts.csv"
 FRONTEND_DIRECTORY = "../datafest-webpage/build"
+MODEL_DIRECTORY = "../../data/BARTesquire"
 
 print("Starting recommender service...", end=" ", flush=True)
-recommender_service = RecommenderService(NUM_NEIGHBORS_TO_RETURN, INDEX_VECTORS_FILE, QUESTIONPOSTS_COMBINED_FILE)
+recommender_service = RecommenderService(NUM_NEIGHBORS_TO_RETURN, INDEX_VECTORS_FILE, QUESTIONPOSTS_COMBINED_FILE, MODEL_DIRECTORY)
 recommender_service.start()
 print("started.")
 
