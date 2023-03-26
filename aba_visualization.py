@@ -1,31 +1,16 @@
+import json
 import pickle
 from urllib.request import urlopen
-import json
 
-import plotly.graph_objects as go
-import pandas as pd
 import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
+from dash import Dash, dcc, html, Input, Output
 
 client_df = pd.read_csv("../../data/client_questionposts.csv")
 with open("../../data/map_files.pickle", "rb+") as file:
     fips_grouped, cat_list, ethnic_list = pickle.load(file)
-
-# fips_grouped = client_df.groupby("fips_codes")
-
-# cat_list = []
-# for name, group in fips_grouped["Category"]:
-#     group_string = group.value_counts().to_string().strip().replace("\n", "<br>")
-#     cat_list.append(re.sub(r'\s+', ' ', group_string))
-
-# ethnic_list = []
-# for name, group in fips_grouped["EthnicIdentity_x"]:
-#     group_string = group.value_counts().to_string().strip().replace("\n", "<br>")
-#     ethnic_list.append(re.sub(r'\s+', ' ', group_string))
-
-# with open("map_files.pickle", "wb+") as file:
-#     pickle.dump([fips_grouped, cat_list, ethnic_list], file)
-
-# exit()
 
 client_df["fips_codes"] = client_df["fips_codes"].replace(np.nan, 0)
 client_df["fips_codes"] = client_df["fips_codes"].astype(float).astype(int).astype(str)
@@ -36,17 +21,10 @@ for idx, row in client_df.iterrows():
 with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
     counties = json.load(response)
 
-from dash import Dash, dcc, html, Input, Output
-import plotly.express as px
-
-# token = open(".mapbox_token").read() # you will need your own token
-
 dash_app = Dash(__name__, requests_pathname_prefix='/dash/')
 
 dash_app.layout = html.Div([
     dcc.Link('Home Page', href='/', refresh=True),
-    # html.H4('Polotical candidate voting pool analysis'),
-    # html.P("Select a candidate:"),
     dcc.RadioItems(
         id='candidate',
         options=[],
@@ -57,9 +35,7 @@ dash_app.layout = html.Div([
 ])
 
 
-@dash_app.callback(
-    Output("graph", "figure"),
-    Input("candidate", "value"))
+@dash_app.callback(Output("graph", "figure"), Input("candidate", "value"))
 def display_choropleth(candidate):
     fips_grouped = client_df.groupby("fips_codes")
     df = pd.DataFrame(fips_grouped.groups.keys())
@@ -97,6 +73,3 @@ def display_choropleth(candidate):
         height=750,
     )
     return fig
-
-
-# app.run_server(debug=True, port=8889)
