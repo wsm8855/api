@@ -36,14 +36,23 @@ async def post_text(text_request: TextRequest):
 
 @api_app.post("/categoricalQuery")
 async def post_categorical_query(query_request: CategoricalRequest):
-    age = query_request.age
-    if len(age) == 0:
-        age = None
+    print("categoricalQuery")
+
+    def none_if_empty(thing):
+        if len(thing) == 0:
+            return None
+        return thing
+
+    age = none_if_empty(query_request.age)
+    ethnicities = none_if_empty(query_request.ethnicities)
+    genders = none_if_empty(query_request.genders)
+    states = none_if_empty(query_request.states)
+
     result = categorical_query_service.query_question(
         age=age,
-        ethnicities=query_request.ethnicities,
-        genders=query_request.genders,
-        states=query_request.states
+        ethnicities=ethnicities,
+        genders=genders,
+        states=states
     )
     if result is None:
         result = {"success": False}  # sad path
