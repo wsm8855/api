@@ -16,7 +16,7 @@ response = requests.post(SERVER + "api/text/", data=json.dumps({"wrong_field_nam
 print(response.json())
 
 print("Sending categorical query (good)")
-response = requests.post(SERVER + "api/categoricalQuery/",
+response = requests.get(SERVER + "api/categoricalQuery/",
                          data=json.dumps({
                              "age": [24, 26],
                              "ethnicities": ["Caucasian"],
