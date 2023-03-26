@@ -36,8 +36,11 @@ async def post_text(text_request: TextRequest):
 
 @api_app.post("/categoricalQuery")
 async def post_categorical_query(query_request: CategoricalRequest):
+    age = query_request.age
+    if len(age) == 0:
+        age = None
     result = categorical_query_service.query_question(
-        age=query_request.age,
+        age=age,
         ethnicities=query_request.ethnicities,
         genders=query_request.genders,
         states=query_request.states
