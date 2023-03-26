@@ -17,7 +17,7 @@ recommender_service.start()
 app = FastAPI(title="app")
 api_app = FastAPI(title="api-app")
 
-app.mount("/api", api_app) # need to do this so that it doesn't try to interpret api calls as static file requests
+app.mount("/api", api_app)  # need to do this so that it doesn't try to interpret api calls as static file requests
 app.mount("/", StaticFiles(directory="../datafest-webpage/build", html=True), name="build")
 
 
@@ -31,5 +31,5 @@ async def post_text(text_request: TextRequest):
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8889)
     recommender_service.stop()
