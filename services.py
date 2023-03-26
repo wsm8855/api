@@ -22,7 +22,7 @@ THREAD_SHUTDOWN_SIGNAL = ThreadShutdownSignal()
 
 class RecommenderService(threading.Thread):
 
-    def __init__(self, index_vectors_file, index_keys_file, questionposts_combined_file):
+    def __init__(self, num_neighbors_to_return, index_vectors_file, index_keys_file, questionposts_combined_file):
         # setup thread stuff
         super().__init__()
         self.queue = Queue()
@@ -31,6 +31,7 @@ class RecommenderService(threading.Thread):
         self.result = None
 
         # setup faiss indexing
+        self.num_neighbors_to_return = num_neighbors_to_return
         self.index_vectors_file = index_vectors_file
         self.index_keys_file = index_keys_file
         self.questionposts_combined_file = questionposts_combined_file
@@ -53,7 +54,13 @@ class RecommenderService(threading.Thread):
         df = self.questionposts_combined
         embedding_index = df[df["QuestionUno"] == question_uno].index[0]
         embedding = self.index_vectors[embedding_index].reshape(1, -1)
-        return self.query_by_embedding(embedding)
+        post_texts, questionUnos = self.query_by_embedding(embedding, self.num_neighbors_to_return + 1)
+        duplicate_index = questionUnos.index(question_uno)
+        if duplicate_index != -1:
+            post_texts.pop(duplicate_index)  # remove duplicate
+        else:
+            post_texts.pop()  # no duplicate, remove last item (least similar)
+        return post_texts
 
     def query_by_text(self, text):
         self.event.clear()
@@ -61,13 +68,16 @@ class RecommenderService(threading.Thread):
         self.event.wait()
         return self.result
 
-    def query_by_embedding(self, embedding, num_neighbors_to_return=5):
+    def query_by_embedding(self, embedding, num_neighbors_to_return=None):
+        if num_neighbors_to_return is None:
+            num_neighbors_to_return = self.num_neighbors_to_return
         embedding = embedding.astype(np.float32)
         print(embedding.shape, embedding.dtype)
         distances, indexes = self.faiss_index.search(embedding, num_neighbors_to_return)
         print(indexes.squeeze())
-        results = list(self.questionposts_combined.iloc[indexes.squeeze()]["PostText"])
-        return results
+        post_texts = list(self.questionposts_combined.iloc[indexes.squeeze()]["PostText"])
+        questionUnos = list(self.questionposts_combined.iloc[indexes.squeeze()]["QuestionUno"])
+        return post_texts, questionUnos
 
     def run(self, *args, **kwargs):
         while self.running:
@@ -75,7 +85,8 @@ class RecommenderService(threading.Thread):
             if text is THREAD_SHUTDOWN_SIGNAL:
                 break
             # do stuff...
-            self.result = self.query_by_embedding(self.embedding_model.embed(text))
+            post_texts, questionUnos = self.query_by_embedding(self.embedding_model.embed(text))
+            self.result = post_texts
             self.event.set()
 
     def stop(self):
